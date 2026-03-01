@@ -16,13 +16,13 @@ export const ENDPOINTS = {
     CHANGE_PASSWORD: '/auth/change-password',
   },
   USERS: {
-    GET_ALL: '/users/allusers',
-    GET_BY_ID: (id: string) => `/users/users/${id}`,
-    UPDATE_PREFERENCES: (id: string) => `/users/users/${id}/preferences`,
+    GET_ALL: '/users/allUsers',
+    GET_BY_ID: (id: string) => `/users/user/${id}`,
+    UPDATE_PREFERENCES: (id: string) => `/users/user/${id}/preferences`,
   },
   CHAT: {
     SEND_MESSAGE: '/chat',
-    GET_CONVERSATIONS: '/conversations',
-    GET_MESSAGES: (conversationId: string) => `/conversations/${conversationId}`,
+    GET_CONVERSATIONS: '/chat/conversations',
+    GET_MESSAGES: (conversationId: string) => `/chat/conversations/${conversationId}`,
   },
 } as const;
