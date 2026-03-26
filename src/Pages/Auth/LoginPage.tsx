@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const { login, loginLoading, loginError } = useAuth();
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+  const handleSubmit: React.SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -94,6 +94,15 @@ export default function LoginPage() {
                   disabled={loginLoading}
                 />
               </div>
+
+              <div className="text-right mt-2">
+                <Link
+                to="/forgot-password"
+                className="text-sm text-blue-600 hover:underline"
+                >
+                  Forgot Password?
+                </Link>
+            </div>
             </div>
 
             {/* Submit Button */}

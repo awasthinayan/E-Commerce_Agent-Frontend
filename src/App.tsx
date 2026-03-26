@@ -1,50 +1,58 @@
 // src/App.tsx
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import LoginPage from './Pages/Auth/LoginPage';
-import RegisterPage from './Pages/Auth/RegisterPage';
-import ChatPage from './Pages/Chat/ChatPage';
-import DashboardPage from './Pages/Dashboard/DashboardPage';
-import ProfilePage from './Pages/Dashboard/ProfilePage';
-import NotFoundPage from './Pages/NotFound/NotFoundPage';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 
-// Create a client for React Query
+import LoginPage from "./Pages/Auth/LoginPage";
+import RegisterPage from "./Pages/Auth/RegisterPage";
+import ChatPage from "./Pages/Chat/ChatPage";
+import DashboardPage from "./Pages/Dashboard/DashboardPage";
+import ProfilePage from "./Pages/Dashboard/ProfilePage";
+import NotFoundPage from "./Pages/NotFound/NotFoundPage";
+import WelcomePage from "./Pages/Welcome/WelcomePage";
+
+import Loader from "./Components/Common/Loader";
+import PageWrapper from "./Components/Common/PageWrapper";
+import ForgotPassword from "./Pages/ForgetPassword/ForgetPassword";
+import ResetPassword from "./Pages/ForgetPassword/ResetPassword";
+
+// React Query Client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 60 * 5,
       refetchOnWindowFocus: false,
     },
   },
 });
 
-// Protected Route Component
+// Helper function
+const isAuthenticated = () => {
+  return !!localStorage.getItem("token");
+};
+
+// Protected Route
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // ✅ Check token directly from localStorage instead of authService
-  const token = localStorage.getItem('token');
-  
-  if (!token) {
+  if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;
 };
 
-// Public Route Component (redirect to dashboard if authenticated)
+// Public Route
 interface PublicRouteProps {
   children: React.ReactNode;
 }
 
 const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
-  // ✅ Check token directly from localStorage instead of authService
-  const token = localStorage.getItem('token');
-  
-  if (token) {
+  if (isAuthenticated()) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -52,67 +60,141 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 };
 
 function App() {
+
+  // Global startup loader
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500); // loader duration
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <Routes>
-          {/* Public Routes */}
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <PublicRoute>
-                <RegisterPage />
-              </PublicRoute>
-            }
-          />
+        <AnimatePresence mode="wait">
 
-          {/* Protected Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/chat"
-            element={
-              <ProtectedRoute>
-                <ChatPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
+          <Routes>
 
-          {/* Root Route - ✅ Check auth and redirect accordingly */}
-          <Route 
-            path="/" 
-            element={
-              localStorage.getItem('token') 
-                ? <Navigate to="/dashboard" replace /> 
-                : <Navigate to="/login" replace />
-            } 
-          />
+            {/* Welcome Page */}
+            <Route
+              path="/welcome"
+              element={
+                <PageWrapper>
+                  <WelcomePage />
+                </PageWrapper>
+              }
+            />
 
-          {/* Not Found */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+            {/* Public Routes */}
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <PageWrapper>
+                    <LoginPage />
+                  </PageWrapper>
+                </PublicRoute>
+              }
+            />
+
+            <Route
+              path="/register"
+              element={
+                <PublicRoute>
+                  <PageWrapper>
+                    <RegisterPage />
+                  </PageWrapper>
+                </PublicRoute>
+              }
+            />
+
+            {/* Protected Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <PageWrapper>
+                    <DashboardPage />
+                  </PageWrapper>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/forgot-password"
+              element={
+                <PublicRoute>
+                  <PageWrapper>
+                    <ForgotPassword />
+                  </PageWrapper>
+                </PublicRoute>
+              }
+            />
+
+            <Route
+              path="/reset-password/:token"
+              element={
+                <PublicRoute>
+                  <PageWrapper>
+                    <ResetPassword />
+                  </PageWrapper>
+                </PublicRoute>
+              }
+            />
+
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <PageWrapper>
+                    <ChatPage />
+                  </PageWrapper>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <PageWrapper>
+                    <ProfilePage />
+                  </PageWrapper>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Root Route */}
+            <Route
+              path="/"
+              element={
+                isAuthenticated()
+                  ? <Navigate to="/dashboard" replace />
+                  : <Navigate to="/welcome" replace />
+              }
+            />
+
+            {/* Not Found */}
+            <Route
+              path="*"
+              element={
+                <PageWrapper>
+                  <NotFoundPage />
+                </PageWrapper>
+              }
+            />
+
+          </Routes>
+
+        </AnimatePresence>
       </Router>
     </QueryClientProvider>
   );

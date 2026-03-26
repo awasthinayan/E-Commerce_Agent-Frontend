@@ -1,7 +1,8 @@
 // src/pages/Auth/RegisterPage.tsx
 
 import { useState } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
+import type { ChangeEvent } from 'react';
+import type React from "react";
 import { Link } from 'react-router-dom';
 import { User, Mail, Lock, Loader } from 'lucide-react';
 import useAuth from '../../Hooks/useAuth';
@@ -31,9 +32,7 @@ export default function RegisterPage() {
   };
 
   // ✅ Modern React 19 compatible typing
-  const handleSubmit = async (
-    e: FormEvent<HTMLFormElement>
-  ) => {
+ const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
@@ -108,10 +107,11 @@ export default function RegisterPage() {
 
             {/* Name */}
             <div>
-              <label className="label">Full Name</label>
+              <label htmlFor="name" className="label">Full Name</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                 id="name"
                   type="text"
                   name="name"
                   value={formData.name}
@@ -124,10 +124,11 @@ export default function RegisterPage() {
 
             {/* Email */}
             <div>
-              <label className="label">Email</label>
+              <label htmlFor="email" className="label">Email</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                 id="email"
                   type="email"
                   name="email"
                   value={formData.email}
@@ -140,10 +141,11 @@ export default function RegisterPage() {
 
             {/* Password */}
             <div>
-              <label className="label">Password</label>
+              <label htmlFor="password" className="label">Password</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="password"
                   type="password"
                   name="password"
                   value={formData.password}
@@ -156,10 +158,11 @@ export default function RegisterPage() {
 
             {/* Confirm Password */}
             <div>
-              <label className="label">Confirm Password</label>
+              <label htmlFor="confirmPassword" className="label">Confirm Password</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="confirmPassword"
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
